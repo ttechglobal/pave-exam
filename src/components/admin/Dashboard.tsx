@@ -3,10 +3,14 @@
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@supabase/supabase-js";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+// Lazy factory — avoids module-level eval during Next.js prerender
+// when env vars aren't available in the build environment
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
 
 interface Flag {
   type: string;
@@ -70,7 +74,7 @@ export default function Dashboard() {
   const [newFlagAlert, setNewFlagAlert] = useState<string | null>(null);
 
   const fetchSessions = useCallback(async () => {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from("sessions")
       .select("*")
       .order("started_at", { ascending: false });
@@ -88,7 +92,7 @@ export default function Dashboard() {
     fetchSessions();
 
     // Real-time subscription — updates appear instantly without page refresh
-    const channel = supabase
+    const channel = getSupabase()
       .channel("sessions-dashboard")
       .on(
         "postgres_changes",
@@ -122,7 +126,7 @@ export default function Dashboard() {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      getSupabase().removeChannel(channel);
     };
   }, [fetchSessions]);
 
