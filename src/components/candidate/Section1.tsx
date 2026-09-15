@@ -112,7 +112,7 @@ export default function Section1() {
             <span className="text-red-500 ml-1">*</span>
           </h2>
           <p className="text-sm text-gray-500 mb-6 leading-relaxed">
-            Working as a professional requires you to be sufficiently fit and able to
+            Vocation programs in Finland require you to be sufficiently fit and able to
             do physical work. Work may require that you are standing on your feet for long
             hours, walking, bending down, carrying and moving items.
           </p>
