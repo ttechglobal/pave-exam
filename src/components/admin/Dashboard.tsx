@@ -72,6 +72,7 @@ export default function Dashboard() {
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
   const [filter, setFilter] = useState<"all" | "active" | "submitted" | "locked">("all");
   const [newFlagAlert, setNewFlagAlert] = useState<string | null>(null);
+  const [detailTab, setDetailTab] = useState<"overview" | "section1" | "section2" | "section3">("overview");
 
   const fetchSessions = useCallback(async () => {
     const { data, error } = await getSupabase()
@@ -258,7 +259,7 @@ export default function Dashboard() {
                   return (
                     <button
                       key={session.id}
-                      onClick={() => setSelectedSession(session)}
+                      onClick={() => { setSelectedSession(session); setDetailTab("overview"); }}
                       className={`w-full text-left bg-white rounded-2xl border p-5
                         transition-all hover:shadow-md
                         ${
@@ -355,7 +356,7 @@ export default function Dashboard() {
                       </p>
                     </div>
                     <button
-                      onClick={() => setSelectedSession(null)}
+                      onClick={() => { setSelectedSession(null); setDetailTab("overview"); }}
                       className="text-gray-400 hover:text-white text-lg transition-colors"
                     >
                       ×
@@ -363,8 +364,27 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                <div className="p-6 space-y-5 max-h-[calc(100vh-200px)] overflow-y-auto">
+                {/* Tab nav */}
+                <div className="flex border-b border-[#E0DEFC] px-4 pt-3 bg-gray-50 gap-1">
+                  {(["overview", "section1", "section2", "section3"] as const).map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setDetailTab(tab)}
+                      className={`px-3 py-2 text-xs font-semibold rounded-t-lg transition-all capitalize
+                        ${detailTab === tab
+                          ? "bg-white border border-b-white border-[#E0DEFC] text-[#5B5BD6] -mb-px"
+                          : "text-gray-400 hover:text-gray-600"
+                        }`}
+                    >
+                      {tab === "overview" ? "Overview" : tab === "section1" ? "Section 1" : tab === "section2" ? "Section 2" : "Section 3"}
+                    </button>
+                  ))}
+                </div>
 
+                <div className="p-6 space-y-5 max-h-[calc(100vh-240px)] overflow-y-auto">
+
+                  {/* ── OVERVIEW TAB ── */}
+                  {detailTab === "overview" && (<>
                   {/* Status + basic info */}
                   <div>
                     <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
@@ -383,19 +403,18 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  {/* Flags — highlighted prominently */}
+                  {/* Flags */}
                   <div
                     className={`rounded-xl border p-4
                       ${
                         selectedSession.tab_switch_count === 0
                           ? "bg-green-50 border-green-100"
-                          : selectedSession.tab_switch_count >= 3
+                          : selectedSession.tab_switch_count >= 5
                           ? "bg-red-50 border-red-200"
                           : "bg-amber-50 border-amber-200"
                       }`}
                   >
-                    <p className="text-xs font-semibold uppercase tracking-widest mb-2
-                      text-gray-500">
+                    <p className="text-xs font-semibold uppercase tracking-widest mb-2 text-gray-500">
                       Tab-Switch Violations
                     </p>
                     <p
@@ -403,31 +422,20 @@ export default function Dashboard() {
                         ${
                           selectedSession.tab_switch_count === 0
                             ? "text-green-600"
-                            : selectedSession.tab_switch_count >= 3
+                            : selectedSession.tab_switch_count >= 5
                             ? "text-red-600"
                             : "text-amber-600"
                         }`}
                     >
-                      {selectedSession.tab_switch_count} / 3
+                      {selectedSession.tab_switch_count} / 5
                     </p>
-
                     {selectedSession.flags && selectedSession.flags.length > 0 ? (
                       <div className="mt-3 space-y-2">
                         {selectedSession.flags.map((flag, i) => (
-                          <div
-                            key={i}
-                            className="flex items-center justify-between text-xs
-                              border-t border-amber-100 pt-2"
-                          >
-                            <span className="text-amber-700 font-medium">
-                              Warning {flag.count} · Section {flag.section}
-                            </span>
+                          <div key={i} className="flex items-center justify-between text-xs border-t border-amber-100 pt-2">
+                            <span className="text-amber-700 font-medium">Warning {flag.count} · Section {flag.section}</span>
                             <span className="text-amber-500">
-                              {new Date(flag.timestamp).toLocaleTimeString("en-GB", {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                                second: "2-digit",
-                              })}
+                              {new Date(flag.timestamp).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
                             </span>
                           </div>
                         ))}
@@ -439,38 +447,28 @@ export default function Dashboard() {
 
                   {/* Timing */}
                   <div>
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
-                      Timing
-                    </p>
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">Timing</p>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-gray-500">Started</span>
-                        <span className="text-[#0D0D2B] font-medium">
-                          {formatTime(selectedSession.started_at)}
-                        </span>
+                        <span className="text-[#0D0D2B] font-medium">{formatTime(selectedSession.started_at)}</span>
                       </div>
                       {selectedSession.submitted_at && (
                         <div className="flex justify-between">
                           <span className="text-gray-500">Submitted</span>
-                          <span className="text-[#0D0D2B] font-medium">
-                            {formatTime(selectedSession.submitted_at)}
-                          </span>
+                          <span className="text-[#0D0D2B] font-medium">{formatTime(selectedSession.submitted_at)}</span>
                         </div>
                       )}
                       <div className="flex justify-between">
                         <span className="text-gray-500">Time used</span>
-                        <span className="text-[#0D0D2B] font-medium">
-                          {formatDuration(selectedSession.time_remaining)}
-                        </span>
+                        <span className="text-[#0D0D2B] font-medium">{formatDuration(selectedSession.time_remaining)}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Candidate details */}
                   <div>
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
-                      Candidate
-                    </p>
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">Candidate</p>
                     <div className="space-y-2 text-sm">
                       {[
                         ["Nationality", selectedSession.personal_details?.nationality],
@@ -485,12 +483,10 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  {/* Section 3 score if submitted */}
+                  {/* Maths score */}
                   {selectedSession.answers?.section3?.score !== undefined && (
                     <div className="bg-[#EEEDF8] border border-[#E0DEFC] rounded-xl p-4">
-                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
-                        Maths Score
-                      </p>
+                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">Maths Score</p>
                       <p className="text-3xl font-black text-[#5B5BD6]">
                         {selectedSession.answers.section3.score as number}
                         <span className="text-gray-300 text-lg font-normal"> / 11</span>
@@ -500,10 +496,115 @@ export default function Dashboard() {
 
                   {/* Session ID */}
                   <div>
-                    <p className="text-xs text-gray-300 font-mono break-all">
-                      ID: {selectedSession.id}
-                    </p>
+                    <p className="text-xs text-gray-300 font-mono break-all">ID: {selectedSession.id}</p>
                   </div>
+                  </>)}
+
+                  {/* ── SECTION 1 TAB — Health & Ability ── */}
+                  {detailTab === "section1" && (
+                    <div className="space-y-4">
+                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest">
+                        Health &amp; Ability to Manage Living in Finland
+                      </p>
+                      {!selectedSession.answers?.section1 || Object.keys(selectedSession.answers.section1).length === 0 ? (
+                        <p className="text-sm text-gray-400 italic">No responses recorded yet.</p>
+                      ) : (<>
+                        {/* Physical health */}
+                        {(selectedSession.answers.section1 as any).physicalHealth && (
+                          <div className="bg-[#EEEDF8] rounded-xl border border-[#E0DEFC] p-4">
+                            <p className="text-xs text-gray-400 mb-1 font-medium">Q1 — Physical Condition</p>
+                            <p className="text-sm font-semibold text-[#0D0D2B] capitalize">
+                              {(selectedSession.answers.section1 as any).physicalHealth === "healthy"
+                                ? "✅ Physically healthy — no limitations"
+                                : "⚠️ Has physical limitations"}
+                            </p>
+                            {(selectedSession.answers.section1 as any).physicalLimitationDetail && (
+                              <p className="text-sm text-gray-600 mt-2 leading-relaxed">
+                                {(selectedSession.answers.section1 as any).physicalLimitationDetail}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                        {/* Responsibilities */}
+                        <div className="bg-[#EEEDF8] rounded-xl border border-[#E0DEFC] p-4">
+                          <p className="text-xs text-gray-400 mb-1 font-medium">Q2 — Student Responsibilities</p>
+                          <p className="text-sm font-semibold text-[#0D0D2B]">
+                            {(selectedSession.answers.section1 as any).agreedToResponsibilities
+                              ? "✅ Agreed to responsibilities"
+                              : "❌ Did not agree"}
+                          </p>
+                        </div>
+                      </>)}
+                    </div>
+                  )}
+
+                  {/* ── SECTION 2 TAB — Personal Background ── */}
+                  {detailTab === "section2" && (() => {
+                    const s2 = selectedSession.answers?.section2 as any;
+                    const s2Questions: [string, string][] = [
+                      ["knowledgeOfFinland",  "What do you know about Finland?"],
+                      ["reasonsForMoving",    "Main reasons for wanting to move to Finland?"],
+                      ["adaptationPlan",      "How would you adapt to living in a new country?"],
+                      ["lifeSituation",       "How does your life situation fit with full-time studies?"],
+                      ["futurePlans",         "Future plans after graduation?"],
+                      ["whyChooseYou",        "Why should we choose you?"],
+                      ["workExperience",      "Do you have any work experience?"],
+                    ];
+                    return (
+                      <div className="space-y-4">
+                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest">
+                          Personal Background &amp; Motivation
+                        </p>
+                        {!s2 || Object.keys(s2).length === 0 ? (
+                          <p className="text-sm text-gray-400 italic">No responses recorded yet.</p>
+                        ) : (
+                          s2Questions.map(([key, label], i) => (
+                            <div key={key} className="bg-[#EEEDF8] rounded-xl border border-[#E0DEFC] p-4">
+                              <p className="text-xs text-gray-400 mb-1 font-medium">Q{i + 1} — {label}</p>
+                              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                                {s2[key] || <span className="italic text-gray-300">Not answered</span>}
+                              </p>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    );
+                  })()}
+
+                  {/* ── SECTION 3 TAB — Maths ── */}
+                  {detailTab === "section3" && (() => {
+                    const s3 = selectedSession.answers?.section3 as any;
+                    return (
+                      <div className="space-y-4">
+                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest">
+                          Mathematical Reasoning
+                        </p>
+                        {!s3 || Object.keys(s3).length === 0 ? (
+                          <p className="text-sm text-gray-400 italic">No responses recorded yet.</p>
+                        ) : (<>
+                          {s3.score !== undefined && (
+                            <div className="bg-[#EEEDF8] border border-[#E0DEFC] rounded-xl p-5 text-center">
+                              <p className="text-xs text-gray-400 mb-1 font-medium uppercase tracking-widest">Final Score</p>
+                              <p className="text-4xl font-black text-[#5B5BD6]">
+                                {s3.score}
+                                <span className="text-gray-300 text-xl font-normal"> / 11</span>
+                              </p>
+                            </div>
+                          )}
+                          {/* Individual answers */}
+                          {Object.entries(s3)
+                            .filter(([k]) => k !== "score")
+                            .map(([key, val], i) => (
+                              <div key={key} className="bg-[#EEEDF8] rounded-xl border border-[#E0DEFC] p-4">
+                                <p className="text-xs text-gray-400 mb-1 font-medium">Question {i + 1}</p>
+                                <p className="text-sm text-gray-700 font-semibold">{String(val) || "—"}</p>
+                              </div>
+                            ))}
+                        </>)}
+                      </div>
+                    );
+                  })()}
+
                 </div>
               </div>
             </div>

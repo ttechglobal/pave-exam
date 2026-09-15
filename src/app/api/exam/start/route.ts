@@ -25,6 +25,35 @@ export async function POST(req: NextRequest) {
 
     const supabase = getSupabase();
 
+    // Block duplicate / retake attempts for the same email
+    const email = personalDetails?.email?.toLowerCase().trim();
+    if (!email) {
+      return NextResponse.json(
+        { error: "Email address is required." },
+        { status: 400 }
+      );
+    }
+
+    const { data: existing } = await supabase
+      .from("sessions")
+      .select("id, status")
+      .ilike("personal_details->>email", email)
+      .limit(1)
+      .maybeSingle();
+
+    if (existing) {
+      const isActive = existing.status === "active";
+      return NextResponse.json(
+        {
+          error: isActive
+            ? "An exam session is already in progress for this email address. Please contact your invigilator."
+            : "An exam has already been submitted for this email address. Retakes are not permitted.",
+          code: "DUPLICATE_EMAIL",
+        },
+        { status: 409 }
+      );
+    }
+
     const { data, error } = await supabase
       .from("sessions")
       .insert({
