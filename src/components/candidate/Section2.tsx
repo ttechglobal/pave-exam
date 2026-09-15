@@ -27,11 +27,6 @@ const questions = [
     placeholder: "Explain how your family, financial, and personal circumstances support or might challenge this commitment...",
   },
   {
-    key: "knowledgeOfCleaning",
-    label: "What do you know about professional cleaning? What sort of work tasks interest you? In what sort of work environment do you see yourself working after graduation?",
-    placeholder: "Share your understanding of professional cleaning standards, tools, and practices, and describe the work environment that appeals to you...",
-  },
-  {
     key: "futurePlans",
     label: "What are your future plans after graduation? Where do you see yourself in 5 years?",
     placeholder: "Describe your career goals and how this qualification will help you achieve them. Paint a picture of your life five years from now...",
@@ -43,8 +38,8 @@ const questions = [
   },
   {
     key: "workExperience",
-    label: "Do you have any work experience in the cleaning field or customer service?",
-    placeholder: "Describe any relevant work experience, including roles, duration, and key responsibilities...",
+    label: "Do you have any work experience?",
+    placeholder: "Describe any work experience you have, including roles, duration, and key responsibilities...",
   },
 ] as const;
 

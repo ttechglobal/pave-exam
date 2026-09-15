@@ -44,9 +44,6 @@ export default function LandingPage() {
           <span className="text-[#5B5BD6]">Entrance</span>
           <br />Examination
         </h1>
-        <p className="mt-5 text-gray-500 text-base max-w-lg text-center leading-relaxed">
-          Cleaning &amp; Property Services · Finland
-        </p>
 
         {/* Meta cards */}
         <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-3 w-full max-w-3xl">
@@ -75,11 +72,11 @@ export default function LandingPage() {
           </div>
           <div className="px-8 py-6 space-y-4">
             {[
-              "This is an official entrance examination for the TAKK Vocational Qualification in Cleaning & Property Services.",
+              "Use this official entrance examination for the TAKK Vocational Qualification Programs.",
               "The examination consists of 3 sections: Health & Ability, Personal Background & Motivation, and Mathematical Reasoning.",
               "You have 60 minutes total. The timer starts immediately once you enter the exam and cannot be paused.",
               "Do not switch tabs, minimise, or leave this window at any point during the exam.",
-              "You will receive 3 warnings for tab-switch violations. After the third, your exam will be permanently locked.",
+              "You will receive up to 5 warnings for tab-switch violations. These will be logged and reviewed.",
               "Calculators, mobile phones, and any external aids are strictly prohibited.",
               "Ensure you are in a quiet, well-lit environment with a stable internet connection.",
               "You cannot return to a previous section once you advance.",

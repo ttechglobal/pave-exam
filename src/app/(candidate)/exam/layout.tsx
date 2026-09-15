@@ -9,7 +9,6 @@ export default function ExamLayout({ children }: { children: React.ReactNode }) 
   const { timeRemaining, setTimeRemaining, sessionId, currentSection } = useExamStore();
   const [warningCount, setWarningCount] = useState(0);
   const [showWarning, setShowWarning] = useState(false);
-  const [locked, setLocked] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const warningRef = useRef(0);
 
@@ -61,7 +60,7 @@ export default function ExamLayout({ children }: { children: React.ReactNode }) 
       });
     }
 
-    if (newCount >= 3) setLocked(true);
+    // No lockout — warnings are logged only
   };
 
   const formatTime = (seconds: number) => {
@@ -71,26 +70,6 @@ export default function ExamLayout({ children }: { children: React.ReactNode }) 
   };
 
   const isUrgent = timeRemaining <= 300;
-
-  // ── Locked screen ──────────────────────────────────────────
-  if (locked) {
-    return (
-      <div className="min-h-screen bg-[#EEEDF8] flex items-center justify-center px-4">
-        <div className="text-center max-w-md bg-white rounded-2xl border border-[#E0DEFC]
-          p-12 shadow-sm">
-          <div className="w-16 h-16 rounded-full bg-red-50 border border-red-100 flex
-            items-center justify-center text-2xl mx-auto mb-5">
-            🔒
-          </div>
-          <h1 className="text-xl font-bold text-[#0D0D2B]">Exam Locked</h1>
-          <p className="text-gray-500 mt-3 text-sm leading-relaxed">
-            Your exam has been locked due to repeated tab-switch violations.
-            This incident has been logged. Contact your invigilator immediately.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#EEEDF8] flex flex-col">
@@ -126,20 +105,20 @@ export default function ExamLayout({ children }: { children: React.ReactNode }) 
 
         {/* Warnings */}
         <div className="flex items-center gap-1.5">
-          {[1, 2, 3].map((i) => (
+          {[1, 2, 3, 4, 5].map((i) => (
             <div key={i}
               className={`w-2 h-2 rounded-full transition-colors
                 ${i <= warningCount ? "bg-red-400" : "bg-white/15"}`}
             />
           ))}
           <span className="text-white/40 text-xs ml-1 hidden sm:block">
-            {warningCount}/3
+            {warningCount}/5
           </span>
         </div>
       </div>
 
       {/* Warning modal */}
-      {showWarning && !locked && (
+      {showWarning && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center px-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center">
             <div className="w-14 h-14 rounded-full bg-amber-50 border border-amber-100
@@ -147,14 +126,14 @@ export default function ExamLayout({ children }: { children: React.ReactNode }) 
               ⚠️
             </div>
             <h2 className="text-lg font-bold text-[#0D0D2B]">
-              Warning {warningCount} of 3
+              Warning {warningCount} of 5
             </h2>
             <p className="text-gray-500 mt-2 text-sm leading-relaxed">
               You switched tabs or left the exam window. This has been logged.
             </p>
-            {warningCount === 2 && (
-              <p className="mt-2 text-red-600 text-sm font-semibold">
-                One more violation will permanently lock your exam.
+            {warningCount >= 4 && (
+              <p className="mt-2 text-amber-600 text-sm font-semibold">
+                This is your {warningCount === 4 ? "fourth" : "fifth"} warning. Please stay focused on the exam.
               </p>
             )}
             <button
