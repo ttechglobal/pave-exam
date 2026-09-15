@@ -22,23 +22,13 @@ const questions = [
     placeholder: "Describe the steps you would take to settle in and adjust to life in Finland...",
   },
   {
-    key: "lifeSituation",
-    label: "How does your life situation fit in with full-time studies in Finland? Is there anything in your life that may pose challenges for your participation in the programme?",
-    placeholder: "Explain how your family, financial, and personal circumstances support or might challenge this commitment...",
-  },
-  {
-    key: "futurePlans",
-    label: "What are your future plans after graduation? Where do you see yourself in 5 years?",
-    placeholder: "Describe your career goals and how this qualification will help you achieve them. Paint a picture of your life five years from now...",
-  },
-  {
     key: "whyChooseYou",
     label: "Why should we choose you in this programme?",
     placeholder: "Tell us what makes you a strong and committed candidate for this vocational qualification...",
   },
   {
     key: "workExperience",
-    label: "Do you have any work experience?",
+    label: "Do you have any work experience in this field?",
     placeholder: "Describe any work experience you have, including roles, duration, and key responsibilities...",
   },
 ] as const;
