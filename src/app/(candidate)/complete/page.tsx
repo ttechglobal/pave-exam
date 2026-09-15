@@ -66,8 +66,6 @@ function CompleteContent() {
           <ul className="space-y-3">
             {[
               "Your responses are now being reviewed by the TAKK admissions panel.",
-              "You will receive a confirmation email at the address you provided.",
-              "Successful candidates will be contacted within the stipulated timeframe.",
               "Do not attempt to retake the exam without official authorisation.",
             ].map((item, i) => (
               <li key={i} className="flex items-start gap-3 text-sm text-gray-500">
